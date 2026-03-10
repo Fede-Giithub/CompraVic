@@ -11,5 +11,4 @@ const ProtectedRoutes =()=>{
         return children
     }
 }
-
-export {ProtectedRoutes}
+export default ProtectedRoutes
