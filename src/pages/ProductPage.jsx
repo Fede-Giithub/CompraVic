@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import Layout from "../components/Layout"
 import { URLBACKEND } from "../constants"
+import { useCart } from "../context/CartContext"
 
 const ProductPage = () => {
   const { id } = useParams() // 👈 obtenés el id de la URL
@@ -20,7 +21,7 @@ const ProductPage = () => {
 
     fetchProduct()
   }, [id])
-
+  const { addToCart } = useCart()
   if (!product) return <p>Cargando...</p>
 
   return (
@@ -41,12 +42,11 @@ const ProductPage = () => {
 
         <p><strong>Precio:</strong> ${product.price}</p>
         <p><strong>Stock:</strong> {product.stock}</p>
-        <p><strong>Autor:</strong> {product.author}</p>
 
         {/* 👇 BOTÓN */}
-        <button onClick={() => alert("Agregado al carrito 🛒")}>
-          Agregar al carrito
-        </button>
+        <button onClick={() => addToCart(product)}>
+  Agregar al carrito 🛒
+</button>
 
       </div>
     </Layout>
