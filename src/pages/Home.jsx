@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react"
 import Layout from "../components/Layout"
-import UpdateBook from "../components/UpdateProduct"
+import UpdateProduct from "../components/UpdateProduct"
 import { useAuth } from "../context/AuthContext"
-import { CATEGORIES } from "../constants/categories.js"
-import { ToastMessage } from "../components/ToastMessage.jsx"
-import { URLBACKEND } from "../constants";
+import ToastMessage from "../components/ToastMessage.jsx"
+import { URLBACKEND } from "../constants"
 
 const Home = () => {
   const initialErrorState = {
@@ -34,15 +33,16 @@ const Home = () => {
 
   const fetchingProducts = async (query = "") => {
     setResponseServer(initialErrorState)
+
     try {
-      const response = await fetch(`${URLBACKEND}/products?${query}`, {
-        method: "GET"
-      })
+      const response = await fetch(`${URLBACKEND}/products?${query}`)
       const dataProducts = await response.json()
-      setProducts(dataProducts.data.reverse())
+
+      setProducts(Array.isArray(dataProducts?.data) ? dataProducts.data.reverse() : [])
+
       setResponseServer({
         success: true,
-        notification: "Exito al cargar los productos",
+        notification: "Éxito al cargar los productos",
         error: {
           ...responseServer.error,
           fetch: true
@@ -64,29 +64,29 @@ const Home = () => {
     fetchingProducts()
   }, [])
 
-  const deleteProduct = async (idBook) => {
-    if (!confirm("Esta seguro de que quieres borrar el producto")) {
-      return
-    }
+  const deleteProduct = async (id) => {
+    if (!confirm("¿Seguro que querés borrar el producto?")) return
 
     try {
-      const response = await fetch(`${URLBACKEND}/products/${idBook}`, {
+      const response = await fetch(`${URLBACKEND}/products/${id}`, {
         method: "DELETE",
         headers: {
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         }
       })
-      const dataResponse = await response.json()
 
-      if (dataResponse.error) {
-        alert(dataResponse.error)
+      const data = await response.json()
+
+      if (data.error) {
+        alert(data.error)
         return
       }
 
-      setBooks(books.filter((p) => p._id !== idBook))
-
-      alert(`${dataResponse.data.name} borrado con éxito.`)
-    } catch (error) {}
+      setProducts(products.filter((p) => p._id !== id))
+      alert(`${data.data.name} borrado con éxito`)
+    } catch (error) {
+      console.log("Error al borrar producto")
+    }
   }
 
   const handleUpdateProducts = (p) => {
@@ -111,7 +111,7 @@ const Home = () => {
     if (filters.minPrice) query.append("minPrice", filters.minPrice)
     if (filters.maxPrice) query.append("maxPrice", filters.maxPrice)
 
-    fetchingBooks(query.toString())
+    fetchingProducts(query.toString())
   }
 
   const handleResetFilters = () => {
@@ -120,97 +120,59 @@ const Home = () => {
       stock: 0,
       category: "",
       minPrice: 0,
-      maxPrice: 0,
+      maxPrice: 0
     })
   }
 
   return (
     <Layout>
-      <div className="page-banner">Nuestros Libros</div>
 
-      <section className="page-section">
+      <section>
         <p>
-          Bienvenido {user && user.id} a nuestra tienda. Aquí encontrarás una amplia variedad de libros. Nuestro compromiso es ofrecer calidad y confianza.
+          Bienvenido {user ? user.id : "invitado"}
         </p>
       </section>
 
       <section>
-        <form className="filters-form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="name"
-            placeholder="Buscar por nombre"
-            onChange={handleChange}
-            value={filters.name}
-          />
-          <input
-            type="number"
-            name="stock"
-            placeholder="Ingrese el stock"
-            onChange={handleChange}
-            value={filters.stock}
-          />
-          <input
-            type="number"
-            name="minPrice"
-            placeholder="Precio mínimo"
-            onChange={handleChange}
-            value={filters.minPrice}
-          />
-          <input
-            type="number"
-            name="maxPrice"
-            placeholder="Precio máximo"
-            onChange={handleChange}
-            value={filters.maxPrice}
-          />
-
-          <button type="submit">Aplicar filtros</button>
-          <button type="button" onClick={handleResetFilters}>Cancelar</button>
+        <form onSubmit={handleSubmit}>
+          <input name="name" placeholder="Nombre" onChange={handleChange} />
+          <button type="submit">Buscar</button>
         </form>
       </section>
 
-      {
-        selectedProduct &&
-        <UpdateProducts
+      {selectedProduct && (
+        <UpdateProduct
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
           onUpdate={fetchingProducts}
         />
-      }
+      )}
 
-      <section className="products-grid">
-        {books.map((p, i) => (
-          <div key={i} className="product-card">
+      <section>
+        {products.length === 0 && <p>No hay productos</p>}
 
-            {/* 👇 IMAGEN */}
-            {p.img && (
-              <img
-                src={`${URLBACKEND}/uploads/${p.img}`}
-                alt={p.name}
-                style={{ width: "100%", height: "200px", objectFit: "cover" }}
-              />
-            )}
-
+        {products.map((p) => (
+          <div key={p._id}>
             <h3>{p.name}</h3>
             <p>{p.description}</p>
-            <p><strong>Precio:</strong> ${p.price}</p>
-            <p><strong>Stock:</strong> {p.stock}</p>
-            <p><strong>Categoría:</strong> {p.category}</p>
-            <p><strong>Autor:</strong> {p.author}</p>
 
-            {
-              user && <div className="cont-btn">
-                <button onClick={() => handleUpdateProducts(p)}>Actualizar</button>
+            {user && (
+              <>
+                <button onClick={() => handleUpdateProducts(p)}>Editar</button>
                 <button onClick={() => deleteProduct(p._id)}>Borrar</button>
-              </div>
-            }
+              </>
+            )}
           </div>
         ))}
       </section>
 
-      {!responseServer.error.fetch && <ToastMessage color={"red"} msg={responseServer.notification} />}
-      {responseServer.success && <ToastMessage color={"green"} msg={responseServer.notification} />}
+      {!responseServer.error.fetch && responseServer.notification && (
+        <ToastMessage color="red" msg={responseServer.notification} />
+      )}
+
+      {responseServer.success && (
+        <ToastMessage color="green" msg={responseServer.notification} />
+      )}
     </Layout>
   )
 }

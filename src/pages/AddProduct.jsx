@@ -14,7 +14,17 @@ const AddProduct = () => {
   })
 
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+
+  // Verificar que el usuario sea admin
+  if (!user || user.role !== "admin") {
+    return (
+      <Layout>
+        <div className="page-banner">Acceso Denegado</div>
+        <p>No tienes permisos para acceder a esta página.</p>
+      </Layout>
+    )
+  }
 
   const handleChange = (e) => {
     const { name, value, files } = e.target
