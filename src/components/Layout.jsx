@@ -11,6 +11,7 @@ const Layout = ({ children }) => {
         <Link to="/">Home</Link>
         <Link to="/carrito">Carrito</Link>
         <Link to="/login">Login</Link>
+        <Link to="/registro">Register</Link>
       </nav>
 
       <hr />

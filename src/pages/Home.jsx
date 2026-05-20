@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext"
 import ToastMessage from "../components/ToastMessage.jsx"
 import { URLBACKEND } from "../constants"
 
+
 const Home = () => {
   const initialErrorState = {
     success: null,
@@ -126,6 +127,9 @@ const Home = () => {
 
   return (
     <Layout>
+      <button className="btn btn-primary">
+  Botón Bootstrap
+</button>
 
       <section>
         <p>
