@@ -15,9 +15,8 @@ const CartPage = () => {
   const total = cart.reduce((acc, product) => acc + (product.price * product.quantity), 0)
 
   const handleCheckout = async () => {
-    if (!user) {
-      alert("Debes iniciar sesión para realizar la compra")
-      navigate("/login")
+    if (user.role == "user") {
+      
       return
     }
 

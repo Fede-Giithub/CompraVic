@@ -3,12 +3,18 @@ import { createContext, useContext, useState } from "react";
 const AuthContext = createContext()
 
 const decodeJWT = (token) => {
+  if (!token) return null
+
   try {
-    const base64Payload = token.split(".")[1];
-    const payload = atob(base64Payload.replace(/-/g, "+").replace(/_/g, "/"));
-    return JSON.parse(payload);
+    const base64Payload = token.split(".")[1]
+
+    const payload = atob(
+      base64Payload.replace(/-/g, "+").replace(/_/g, "/")
+    )
+
+    return JSON.parse(payload)
   } catch (error) {
-    return null;
+    return null
   }
 };
 
@@ -24,11 +30,11 @@ const AuthProvider = ({ children }) => {
     setToken(token)
     setUser(decodeJWT(token))
   }
-  const logout =(token) => {
-    sessionStorage.removeItem("token")
-    setToken(null)
-    setUser(decodeJWT(null))
-  }
+  const logout = () => {
+  sessionStorage.removeItem("token")
+  setToken(null)
+  setUser(null)
+}
   
   return (
     <AuthContext.Provider value={{ token, user, login, logout }}>
