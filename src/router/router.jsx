@@ -7,6 +7,7 @@ import Register from "../pages/Register"
 import CartPage from "../pages/CartPage"
 import ProtectedRoutes from "../components/ProtectedRoutes"
 import { useAuth } from "../context/AuthContext"
+import ChatPopup from "../pages/ChatPopup"
 
 const UserRoute = ({ children }) => {
   const { user } = useAuth()
@@ -21,6 +22,7 @@ const UserRoute = ({ children }) => {
 const RouterApp = () => {
   return (
     <BrowserRouter>
+      <ChatPopup />
       <Routes>
       
         <Route path="/" element={<Home />} />

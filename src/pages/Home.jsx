@@ -5,6 +5,9 @@ import { useAuth } from "../context/AuthContext"
 import ToastMessage from "../components/ToastMessage.jsx"
 import { URLBACKEND } from "../constants"
 import { useCart } from "../context/CartContext"
+import ChatPopup from "../pages/ChatPopup"
+
+
 
 const Home = () => {
   const initialErrorState = {
