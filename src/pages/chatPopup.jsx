@@ -1,5 +1,5 @@
 import { useState } from "react"
-import snarkdown from "snarkdown"
+
 const ChatPopup = () => {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState([
@@ -52,15 +52,6 @@ const ChatPopup = () => {
     ])
   }
 }
-
-    const newMessage = {
-      text: input,
-      sender: "user"
-    }
-
-    setMessages([...messages, newMessage])
-    setInput("")
-  }
 
   return (
     <>
@@ -190,6 +181,6 @@ const ChatPopup = () => {
       )}
     </>
   )
-
+}
 
 export default ChatPopup

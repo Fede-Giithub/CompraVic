@@ -1,20 +1,19 @@
 import { useState } from "react"
 import { useAuth } from "../context/AuthContext"
-import { URLBACKEND } from "../constants";
-
+import { URLBACKEND } from "../constants"
 
 const UpdateProduct = ({ product, onClose, onUpdate }) => {
 
-  if (!product) return <p>Cargando producto...</p>;
+  if (!product) return null
 
   const [loader, setLoader] = useState(false)
+
   const [formData, setFormData] = useState({
     name: product.name,
     description: product.description,
     stock: Number(product.stock),
     price: Number(product.price),
     category: product.category,
-    author: product.author
   })
 
   const { token } = useAuth()
@@ -37,17 +36,21 @@ const UpdateProduct = ({ product, onClose, onUpdate }) => {
 
     try {
       setLoader(true)
+
       const response = await fetch(`${URLBACKEND}/products/${product._id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(dataToUpdate)
       })
 
-      onUpdate()
-      onClose()
+      if (response.ok) {
+        onUpdate()
+        onClose()
+      }
+
     } catch (error) {
       console.log("Error al actualizar el producto :(")
     } finally {
@@ -56,51 +59,100 @@ const UpdateProduct = ({ product, onClose, onUpdate }) => {
   }
 
   return (
-    <section className="modal-overlay">
-      <div className="modal-box">
-        <h2>Editar producto</h2>
-        <form className="form-container" onSubmit={handleSubmit}>
-          <input
-            name="name"
-            type="text"
-            value={formData.name}
-            onChange={handleChange}
-          />
-          <input
-            name="description"
-            type="text"
-            value={formData.description}
-            onChange={handleChange}
-          />
-          <input
-            name="price"
-            type="number"
-            value={formData.price}
-            onChange={handleChange}
-          />
-          <input
-            name="stock"
-            type="number"
-            value={formData.stock}
-            onChange={handleChange}
-          />
-          <input
-            name="category"
-            type="text"
-            value={formData.category}
-            onChange={handleChange}
-          />
-          <input
-            name="author"
-            type="text"
-            value={formData.author}
-            onChange={handleChange}
-          />
-          <button type="submit">{loader ? "Enviando..." : "Enviar"}</button>
-        </form>
-        <button className="close-btn" type="button" onClick={onClose}>Cancelar</button>
+    <div
+      className="modal fade show d-block"
+      tabIndex="-1"
+      style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+    >
+      <div className="modal-dialog">
+        <div className="modal-content">
+
+          <div className="modal-header">
+            <h5 className="modal-title">Editar producto</h5>
+
+            <button
+              type="button"
+              className="btn-close"
+              onClick={onClose}
+            ></button>
+          </div>
+
+          <form onSubmit={handleSubmit}>
+
+            <div className="modal-body d-flex flex-column gap-3">
+
+              <input
+                className="form-control"
+                name="name"
+                type="text"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Nombre"
+              />
+
+              <input
+                className="form-control"
+                name="description"
+                type="text"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Descripción"
+              />
+
+              <input
+                className="form-control"
+                name="price"
+                type="number"
+                value={formData.price}
+                onChange={handleChange}
+                placeholder="Precio"
+              />
+
+              <input
+                className="form-control"
+                name="stock"
+                type="number"
+                value={formData.stock}
+                onChange={handleChange}
+                placeholder="Stock"
+              />
+
+              <input
+                className="form-control"
+                name="category"
+                type="text"
+                value={formData.category}
+                onChange={handleChange}
+                placeholder="Categoría"
+              />
+
+            </div>
+
+            <div className="modal-footer">
+
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={onClose}
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loader}
+              >
+                {loader ? "Enviando..." : "Guardar cambios"}
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
       </div>
-    </section>
+    </div>
   )
 }
 
